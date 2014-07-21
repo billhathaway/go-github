@@ -141,7 +141,9 @@ func (s *SearchService) search(searchType string, query string, opt *SearchOptio
 		return nil, err
 	}
 	params.Add("q", query)
-	u := fmt.Sprintf("search/%s?%s", searchType, params.Encode())
+	var u string
+
+	u = fmt.Sprintf("search/%s?%s", searchType, params.Encode())
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
@@ -153,6 +155,5 @@ func (s *SearchService) search(searchType string, query string, opt *SearchOptio
 		// We change it here to fetch back text-match metadata
 		req.Header.Set("Accept", "application/vnd.github.v3.text-match+json")
 	}
-
 	return s.client.Do(req, result)
 }

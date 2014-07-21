@@ -32,8 +32,9 @@ const (
 	headerRateRemaining = "X-RateLimit-Remaining"
 	headerRateReset     = "X-RateLimit-Reset"
 
-	mediaTypeV3      = "application/vnd.github.v3+json"
-	defaultMediaType = "application/octet-stream"
+	mediaTypeV3             = "application/vnd.github.v3+json"
+	defaultMediaType        = "application/octet-stream"
+	defaultEnterprisePrefix = "/api/v3"
 )
 
 // A Client manages communication with the GitHub API.
@@ -69,6 +70,9 @@ type Client struct {
 	Repositories  *RepositoriesService
 	Search        *SearchService
 	Users         *UsersService
+
+	enterprise       bool
+	enterprisePrefix string
 }
 
 // ListOptions specifies the optional parameters to various List methods that
@@ -133,6 +137,36 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
+// NewEnterpriseClient returns a new GitHub API client pointing at arbitrary URLs so it can be used
+// with GitHub Enterprise installations. If a nil httpClient is
+// provided, http.DefaultClient will be used.  To use API methods which require
+// authentication, provide an http.Client that will perform the authentication
+// for you (such as that provided by the goauth2 library).
+// If uploadURL is nil, it will use the baseURL value.
+func NewEnterpriseClient(httpClient *http.Client, baseURL *url.URL, uploadURL *url.URL) *Client {
+	if uploadURL == nil {
+		uploadURL = baseURL
+	}
+
+	c := NewClient(httpClient)
+
+	c.BaseURL = baseURL
+	c.UploadURL = uploadURL
+	c.enterprise = true
+	c.enterprisePrefix = defaultEnterprisePrefix
+	return c
+}
+
+// SetEnterprisePrefix sets the URL prefix when making API requests.
+func (c *Client) SetEnterprisePrefix(prefix string) {
+	c.enterprisePrefix = prefix
+}
+
+// EnterprisePrefix gets the URL prefix when making API requests.
+func (c *Client) EnterprisePrefix() string {
+	return c.enterprisePrefix
+}
+
 // NewRequest creates an API request. A relative URL can be provided in urlStr,
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash.  If
@@ -159,8 +193,20 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	req.Header.Add("Accept", mediaTypeV3)
 	req.Header.Add("User-Agent", c.UserAgent)
+	if c.enterprise {
+		// GitHub Enterprise considers the /search API to be experimental
+		// This accept value is required to use it
+		if strings.HasPrefix(req.URL.Path, "/search") {
+			req.Header.Add("Accept", "application/vnd.github.preview+json")
+		} else {
+			req.Header.Add("Accept", mediaTypeV3)
+		}
+		req.URL.Path = c.enterprisePrefix + req.URL.Path
+		fmt.Printf("URL=%s\n", req.URL.String())
+	} else {
+		req.Header.Add("Accept", mediaTypeV3)
+	}
 	return req, nil
 }
 
