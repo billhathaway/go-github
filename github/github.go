@@ -205,17 +205,8 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	if c.UserAgent != "" {
 		req.Header.Add("User-Agent", c.UserAgent)
 	}
-	if c.enterprise {
-		// GitHub Enterprise considers the /search API to be experimental
-		// This accept value is required to use it
-		if strings.HasPrefix(req.URL.Path, "/search") {
-			req.Header.Add("Accept", "application/vnd.github.preview+json")
-		} else {
-			req.Header.Add("Accept", mediaTypeV3)
-		}
-	} else {
-		req.Header.Add("Accept", mediaTypeV3)
-	}
+	req.Header.Add("Accept", mediaTypeV3)
+
 	return req, nil
 }
 
