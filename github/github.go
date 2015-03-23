@@ -202,10 +202,11 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
+	req.Header.Add("Accept", mediaTypeV3)
 	if c.UserAgent != "" {
 		req.Header.Add("User-Agent", c.UserAgent)
 	}
-	req.Header.Add("Accept", mediaTypeV3)
+
 	return req, nil
 }
 
