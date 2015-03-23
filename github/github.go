@@ -35,6 +35,14 @@ const (
 	mediaTypeV3             = "application/vnd.github.v3+json"
 	defaultMediaType        = "application/octet-stream"
 	defaultEnterprisePrefix = "/api/v3"
+
+	// Media Type values to access preview APIs
+
+	// https://developer.github.com/changes/2014-08-05-team-memberships-api/
+	mediaTypeMembershipPreview = "application/vnd.github.the-wasp-preview+json"
+
+	// https://developer.github.com/changes/2014-01-09-preview-the-new-deployments-api/
+	mediaTypeDeploymentPreview = "application/vnd.github.cannonball-preview+json"
 )
 
 // A Client manages communication with the GitHub API.
@@ -180,8 +188,9 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 
 	u := c.BaseURL.ResolveReference(rel)
 
-	buf := new(bytes.Buffer)
+	var buf io.ReadWriter
 	if body != nil {
+		buf = new(bytes.Buffer)
 		err := json.NewEncoder(buf).Encode(body)
 		if err != nil {
 			return nil, err
@@ -193,7 +202,9 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	req.Header.Add("User-Agent", c.UserAgent)
+	if c.UserAgent != "" {
+		req.Header.Add("User-Agent", c.UserAgent)
+	}
 	if c.enterprise {
 		// GitHub Enterprise considers the /search API to be experimental
 		// This accept value is required to use it
@@ -202,8 +213,6 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		} else {
 			req.Header.Add("Accept", mediaTypeV3)
 		}
-		req.URL.Path = c.enterprisePrefix + req.URL.Path
-		fmt.Printf("URL=%s\n", req.URL.String())
 	} else {
 		req.Header.Add("Accept", mediaTypeV3)
 	}

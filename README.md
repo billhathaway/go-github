@@ -2,10 +2,10 @@
 
 go-github is a Go client library for accessing the [GitHub API][].
 
-**Documentation:** <http://godoc.org/github.com/google/go-github/github>  
+**Documentation:** [![GoDoc](https://godoc.org/github.com/google/go-github?status.svg)](https://godoc.org/github.com/google/go-github)  
 **Mailing List:** [go-github@googlegroups.com](https://groups.google.com/group/go-github)  
-**Build Status:** [![Build Status](https://travis-ci.org/google/go-github.png?branch=master)](https://travis-ci.org/google/go-github)  
-**Test Coverage:** [![Test Coverage](https://coveralls.io/repos/google/go-github/badge.png?branch=master)](https://coveralls.io/r/google/go-github?branch=master) ([gocov report](https://drone.io/github.com/google/go-github/files/coverage.html))
+**Build Status:** [![Build Status](https://travis-ci.org/google/go-github.svg?branch=master)](https://travis-ci.org/google/go-github)  
+**Test Coverage:** [![Test Coverage](https://coveralls.io/repos/google/go-github/badge.svg?branch=master)](https://coveralls.io/r/google/go-github?branch=master) ([gocov report](https://drone.io/github.com/google/go-github/files/coverage.html))
 
 go-github requires Go version 1.1 or greater.
 
@@ -77,11 +77,11 @@ fmt.Println(resp.NextPage) // outputs 3
 
 For complete usage of go-github, see the full [package docs][].
 
-[GitHub API]: http://developer.github.com/v3/
+[GitHub API]: https://developer.github.com/v3/
 [goauth2]: https://code.google.com/p/goauth2/
-[goauth2 docs]: http://godoc.org/code.google.com/p/goauth2/oauth
+[goauth2 docs]: https://godoc.org/code.google.com/p/goauth2/oauth
 [personal API token]: https://github.com/blog/1509-personal-api-tokens
-[package docs]: http://godoc.org/github.com/google/go-github/github
+[package docs]: https://godoc.org/github.com/google/go-github/github
 
 
 ## Roadmap ##
